@@ -33,3 +33,9 @@ class CwClient(TelegramClient, HeroInfo):
         lp = [k for k in HeroInfo.__dict__.keys() if not k.startswith('__')]
         for item in lp:
             exec(f'self.{item} = dm[HeroInfo.{item}]')
+
+if __name__ == "__main__":
+    a = CwClient(session='kk', tg=False)
+    a.update(test_text)
+    print(HeroInfo.castle)
+    print(a.primary_class)
