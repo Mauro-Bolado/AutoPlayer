@@ -33,7 +33,7 @@ loop = asyncio.get_event_loop()
 clients_list: List[CwClient] = clients.clients()
 
 for client in clients_list:
-    client.add_event_handler(me_ping_handler, events.NewMessage(chats='me', pattern='/ping'))
+    client.add_event_handler(me_ping_handler, events.NewMessage(chats=730529057, pattern='/ping'))
     client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
     client.add_event_handler(autoquest_restored_handler, events.NewMessage(chats='chtwrsbot'))
 
@@ -139,8 +139,11 @@ async def async_get_castle_order(client: CwClient, sender, event: Message):
             castle_order(event.text)
             await set_orders(client, str(current_order), pinned=False, minutes=2)
 
-for client in clients_list:
-    client.add_event_handler(async_get_castle_order(client, sender = scriptchats.moon_squad, event = client.get_messages(scriptchats.moon_squad, 1)))
+async def handle():
+    for client in clients_list:
+        order = await client.get_messages(scriptchats.moon_squad, 1)
+        client_event = await async_get_castle_order(client, sender = scriptchats.moon_squad, event = order)
+        client.add_event_handler(client_event)
 
 ###########################################################################################
 #                                        Update Info                                      #

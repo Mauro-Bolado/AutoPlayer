@@ -7,13 +7,13 @@ import re
 
 
 async def me_ping_handler(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     delta_t = datetime.now(timezone.utc) - event.date
     await event.respond('/pong in ' + str(delta_t.total_seconds()) + ' secs')
 
 
 async def go_and_pledge_handler(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if 'You were strolling around on your horse when you noticed' in event.raw_text:
         await asyncio.sleep(randint(10, 50))
         await event.click(0)
@@ -24,7 +24,7 @@ async def go_and_pledge_handler(event: Message):
 
 
 async def autoquest_restored_handler(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if'Stamina restored.' in event.raw_text:
         for i in range(5):
             await asyncio.sleep(randint(2,3))
@@ -38,14 +38,14 @@ async def autoquest_restored_handler(event: Message):
 
 
 async def auto_click_quest_r_handler (event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if 'Many things can happen in the forest.' in event.raw_text:
         await asyncio.sleep(randint(4,5))
         await event.click(0, random.randint(0,2))
 
 
 async def auto_click_foray_handler (event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if 'Many things can happen in the forest.' in event.raw_text:
         await asyncio.sleep(randint(4,5))
         await event.click(1, 0)
@@ -69,13 +69,13 @@ async def massive_spend_handler(event: Message):
 
 
 async def mobs_to_group_handler(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if 'You met some hostile creatures' in event.raw_text:
         await asyncio.sleep(2)
         await event.forward_to(-1001277066769)
 
 async def arena_handler(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     pattern=r'/arena'
     match=re.match(pattern, event.raw_text)
     if match:
@@ -86,14 +86,14 @@ async def arena_handler(event: Message):
 
 
 async def tactics_handler(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if 'Prepare for the attack of' in event.raw_text:
         await asyncio.sleep(randint(1,3))
         await client.send_message('@chtwrsbot', '/tactics_wolfpack')
 
 
 async def drugs(event: Message):
-    client = event.client  # type: CwTgClient
+    client = event.client  # type: CwClient
     if '/rage' in event.raw_text:
         await asyncio.sleep(randint(1,600))
         await client.send_message('@chtwrsbot', '/use_p01')
@@ -117,7 +117,7 @@ async def drugs(event: Message):
         await client.send_message('@chtwrsbot', '/use_p21')
 
 async def go_and_trader(resource: str, event: Message):
-    client = event.client # type: CwTgClient
+    client = event.client # type: CwClient
     if 'You were strolling around on your horse when you noticed' in event.raw_text:
         await asyncio.sleep(randint(20, 50))
         await event.click(0)
