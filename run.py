@@ -37,6 +37,9 @@ for client in clients_list:
     client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
     client.add_event_handler(autoquest_restored_handler, events.NewMessage(chats='chtwrsbot'))
 
+for client in clients_list:
+    client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
+
 
 for client in clients_list:
     client.add_event_handler(auto_click_quest_r_handler, events.NewMessage(chats='@chtwrsbot'))
