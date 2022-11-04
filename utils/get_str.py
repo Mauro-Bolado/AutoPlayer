@@ -12,11 +12,11 @@ def save_session(client, str_session):
    file.close()
    
    file = open("clients.py", "a")
-   str = client + ' = CwClient(session=sessions.' + client + ', tg=True)'
+   str = client + ' = CwClient(session = StringSession(sessions.' + client + '), tg = True)'
    file.write('\n' + str)
    file.close()
 
 with TelegramClient(StringSession(), api_id, api_hash) as session:
-    client = input("Enter your client: ")
-    str = session.session.save()
-    save_session(client, str)
+   client = input("Enter your client: ")
+   str = session.session.save()
+   save_session(client, str)

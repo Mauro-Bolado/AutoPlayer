@@ -9,7 +9,7 @@ class CwClient(TelegramClient, HeroInfo):
 
     def __init__(self, session, tg=True):
         if tg:
-            super().__init__(session=session, api_id = api_id, api_hash = api_hash)
+            super().__init__(session = session, api_id = api_id, api_hash = api_hash)
 
         lp = [k for k in HeroInfo.__dict__.keys() if not k.startswith('__')]
         for item in lp:
@@ -24,7 +24,7 @@ class CwClient(TelegramClient, HeroInfo):
             print("Could not load the handlers correctly")
             return False
 
-    def update(self, me_text: sessions):
+    def update(self, me_text: str):
         match = hero_pattern.match(me_text)
         if not match:
             print("Error parsing /me")
@@ -35,7 +35,7 @@ class CwClient(TelegramClient, HeroInfo):
             exec(f'self.{item} = dm[HeroInfo.{item}]')
 
 if __name__ == "__main__":
-    a = CwClient(session='kk', tg=False)
+    a = CwClient(session = "kk", tg = True)
     a.update(test_text)
-    print(HeroInfo.castle)
+    print(a.castle)
     print(a.primary_class)

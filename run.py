@@ -1,18 +1,24 @@
 # coding: utf-8
+from email.policy import default
+from itertools import count
 from telethon import TelegramClient, events, types
 from telethon.tl.custom import Message
 import asyncio
 import logging
-import re
-from random import randint
-from datetime import datetime, timedelta, timezone
 from regex import hero_pattern
 from hero import CwClient
 from handlers import *
 from typing import List
-import functools as ft
-from utils import sessions
 import clients
+import scriptchats
+from datetime import datetime, timedelta, timezone
+from telethon.tl.custom import Message
+from hero import CwClient
+import asyncio
+from random import randint
+import functools as ft
+import re
+import types
 
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s]%(name)s:%(message)s', level=logging.WARNING)
 
@@ -20,50 +26,61 @@ loop = asyncio.get_event_loop()
 
 
 ###########################################################################################
-#                                  Asignando Eventos
+#                                  Events Asignation                                      #
 ###########################################################################################
 
 
-clientes: List[CwClient] = [v for (k, v) in globals().items() if type(v) is CwClient]
+clients_list: List[CwClient] = clients.clients()
 
-for client in clientes:
-    # print(client.__repr__())
+for client in clients_list:
     client.add_event_handler(me_ping_handler, events.NewMessage(chats='me', pattern='/ping'))
-    # client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
+    client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
+    client.add_event_handler(autoquest_restored_handler, events.NewMessage(chats='chtwrsbot'))
 
 
-# migue.add_event_handler(me_ping_handler, events.NewMessage(chats='me', pattern='/ping'))
+for client in clients_list:
+    client.add_event_handler(auto_click_quest_r_handler, events.NewMessage(chats='@chtwrsbot'))
 
-# #oracle, ephi
-for client in clients:
-    client.add_event_handler(autoquest_restored_handler, events.NewMessage(chats='@chtwrsbot'))
 
-#oracle, ephi
-for client in clients:
-    client.add_event_handler(auto_click_quest_1_handler, events.NewMessage(chats='@chtwrsbot'))
-
-#oracle, ephi
-for client in clients:
+for client in clients_list:
     client.add_event_handler(massive_spend_handler, events.NewMessage(chats='me', pattern=r'/spend (\d{1,2})'))
 
 
 ###########################################################################################
-#                                        Set Orders
+#                                        Orders                                           #
 ###########################################################################################
+
+class Order:
+    attack = ""
+    defend = "🛡Defend"
+    guild = ""
+    guild_alliance = ""
+    tactics = ""
+    
+    def __init__(self, attack = "", guild = "", tactics = "", guild_alliance = ""):
+        self.attack = attack
+        self.guild = guild
+        self.guild_alliance = guild_alliance
+        self.tactics = tactics
+        
+    def __str__(self) -> str:
+        if self.guild_alliance != "":
+            return self.guild_alliance
+        elif self.guild != "":
+            return self.guild
+        elif self.attack != "":
+            return self.attack
+        else:
+            return self.defend
 
 at_least_one_letter_pattern = re.compile(r'.*[a-zA-Z].*')
 
-async def set_orders_async(client: CwClient, chat, order, pinned=False, func=None):
+async def set_orders_async(client: CwClient, order, pinned=False, func=None):
     now = datetime.now(timezone.utc)
     cw_hour = (now.hour + 1) % 8
     message: Message
-    if pinned:
-        message = await client.get_messages(chat, ids=types.InputMessagePinned())
-    else:
-        async for message in client.iter_messages(chat, 1):
-            pass
-        if (now - message.date) > timedelta(hours=cw_hour, minutes=now.minute, seconds=now.second):
-            message.raw_text = order
+    if (now - message.date) > timedelta(hours=cw_hour, minutes=now.minute, seconds=now.second):
+        message.raw_text = order
     if func:
         await func(client, message)
     elif message.raw_text != '':
@@ -79,7 +96,7 @@ def set_orders_sync(client: CwClient, chat, order: str, pinned=False, func=None,
     loop.create_task(set_orders_async(client, chat, order, pinned, func))
     now = datetime.now(timezone.utc)
     cw_hour = (now.hour + 1) % 8
-    delta_t = timedelta(hours=7 - cw_hour, minutes=59 - now.minute, seconds=60 - now.second) \
+    delta_t = timedelta(hours = 7 - cw_hour, minutes=59 - now.minute, seconds=60 - now.second) \
         - timedelta(minutes=minutes)
     if delta_t.total_seconds() < 0:
         delta_t += timedelta(hours=8)
@@ -95,13 +112,55 @@ async def set_orders(client: CwClient, chat, order: str, pinned = False, func = 
     if delta_t.total_seconds() < 0:
         delta_t += timedelta(hours=8)
     delta_s = delta_t.total_seconds()
-    # if client == yeyo:
-    #     print(delta_t)
     loop.call_later(delta_s + randint(30, 250), ft.partial(set_orders_sync, client, chat, order, pinned, func, minutes))
+   
+test_order = """⚔️🦈
+🛡🌑 to DEF!
+Tactics: /tactics_sharkteeth (https://t.me/share/url?url=/tactics_sharkteeth)"""
 
+current_order = Order()
+default_order = "🛡Defend"
 
-for client in []:
-    loop.create_task(set_orders(client, chat=scriptchats.defenders, order='/ga_def', minutes=50))
+order_pattern = re.compile(r'\W{0,2}'
+                           r'(?P<attack>[\S]){0,1}'
+                           r'\W+ to DEF!'
+                           r'\W+Tactics: \W(?P<tactics>\w+)') 
+def castle_order(order: str):
+    global current_order
+    order_match = re.match(order_pattern, order)
+    current_order = Order(order_match.group('attack'), "", order_match.group('tactics'), "") 
+
+async def async_get_castle_order(client: CwClient, sender, event: Message):
+    if event.client == client:
+        if event.sender is sender:
+            castle_order(event.text)
+            await set_orders(client, str(current_order), pinned=False, minutes=2)
+
+for client in clients_list:
+    client.add_event_handler(async_get_castle_order(client, sender = scriptchats.moon_squad, event = client.get_messages(scriptchats.moon_squad, 1)))
+
+###########################################################################################
+#                                        Update Info                                      #
+###########################################################################################
+
+text = "🏅Me"
+
+async def up_to_date_info(client: CwClient, message: Message):
+    now = datetime.now(timezone.utc)
+    cw_hour = (now.hour + 1) % 8
+    count = 1
+    if cw_hour == 0:
+        count = 0
+        client.send_message('chtwrsbot', text)
+    if cw_hour == 7:
+        count = 1
+    if message.sender == 'chtwrsbot':
+        client.update(message.text)
+        file = open('me.txt', 'w')
+        file.write(message.text)
+        file.close()
+        
+for client in clients_list:
+    client.add_event_handler(up_to_date_info, events.NewMessage(chats='@chtwrsbot'))
 
 loop.run_forever()
-

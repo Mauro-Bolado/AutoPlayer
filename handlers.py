@@ -2,7 +2,7 @@ from hero import CwClient, events, TelegramClient
 from telethon.tl.custom.message import Message
 import asyncio
 from datetime import datetime, timedelta, timezone
-from random import randint, uniform
+from random import randint, random, uniform
 import re
 
 
@@ -37,25 +37,11 @@ async def autoquest_restored_handler(event: Message):
                 continue
 
 
-async def auto_click_quest_1_handler (event: Message):
+async def auto_click_quest_r_handler (event: Message):
     client = event.client  # type: CwTgClient
     if 'Many things can happen in the forest.' in event.raw_text:
         await asyncio.sleep(randint(4,5))
-        await event.click(0,0)
-
-
-async def auto_click_quest_2_handler (event: Message):
-    client = event.client  # type: CwTgClient
-    if 'Many things can happen in the forest.' in event.raw_text:
-        await asyncio.sleep(randint(4,5))
-        await event.click(0, 1)
-
-
-async def auto_click_quest_3_handler (event: Message):
-    client = event.client  # type: CwTgClient
-    if 'Many things can happen in the forest.' in event.raw_text:
-        await asyncio.sleep(randint(4,5))
-        await event.click(0, 2)
+        await event.click(0, random.randint(0,2))
 
 
 async def auto_click_foray_handler (event: Message):
