@@ -43,7 +43,7 @@ for client in clients_list:
 
 
 for client in clients_list:
-    client.add_event_handler(auto_click_quest_r_handler, events.NewMessage(chats='@chtwrsbot'))
+    client.add_event_handler(auto_click_quest_r_handler, events.NewMessage(chats='chtwrsbot'))
 
 
 for client in clients_list:
@@ -168,7 +168,7 @@ async def up_to_date_info(client: CwClient, message: Message):
         file.close()
         
 for client in clients_list:
-    client.add_event_handler(up_to_date_info, events.NewMessage(chats='@chtwrsbot'))
+    client.add_event_handler(up_to_date_info, events.NewMessage(chats='chtwrsbot'))
     
 for client in clients_list:
     client.start()

@@ -40,8 +40,10 @@ async def autoquest_restored_handler(event: Message):
 async def auto_click_quest_r_handler (event: Message):
     client = event.client  # type: CwClient
     if 'Many things can happen in the forest.' in event.raw_text:
+        print('clicking')
+        print(event.raw_text)
         await asyncio.sleep(randint(4,5))
-        await event.click(0, random.randint(0,2))
+        await event.message.buttons[0][randint(0, len(event.buttons[0])-1)].click()
 
 
 async def auto_click_foray_handler (event: Message):
