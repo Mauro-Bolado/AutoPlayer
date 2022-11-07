@@ -32,7 +32,6 @@ loop = asyncio.get_event_loop()
 
 clients_list: List[CwClient] = clients.clients()
 
-ini = False
 async def main():
     for client in clients_list:
         client.start()
