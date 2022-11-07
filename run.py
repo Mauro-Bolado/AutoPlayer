@@ -32,10 +32,14 @@ loop = asyncio.get_event_loop()
 
 clients_list: List[CwClient] = clients.clients()
 
+ini = False
+async def main():
+    for client in clients_list:
+        client.start()
+    await clients_list[0].send_message('chtwrsbot', '🏅Me')
 
 for client in clients_list:
-    chat = client.get_entity(730529057)
-    client.add_event_handler(me_ping_handler, events.NewMessage(chats=chat, pattern='/ping'))
+    client.add_event_handler(me_ping_handler, events.NewMessage(pattern='/ping'))
     client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
     client.add_event_handler(autoquest_restored_handler, events.NewMessage(chats='chtwrsbot'))
 
