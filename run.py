@@ -32,8 +32,10 @@ loop = asyncio.get_event_loop()
 
 clients_list: List[CwClient] = clients.clients()
 
+
 for client in clients_list:
-    client.add_event_handler(me_ping_handler, events.NewMessage(chats=730529057, pattern='/ping'))
+    chat = client.get_entity(730529057)
+    client.add_event_handler(me_ping_handler, events.NewMessage(chats=chat, pattern='/ping'))
     client.add_event_handler(go_and_pledge_handler, events.NewMessage(chats='chtwrsbot'))
     client.add_event_handler(autoquest_restored_handler, events.NewMessage(chats='chtwrsbot'))
 
@@ -169,4 +171,5 @@ async def up_to_date_info(client: CwClient, message: Message):
 for client in clients_list:
     client.add_event_handler(up_to_date_info, events.NewMessage(chats='@chtwrsbot'))
 
+print("Done")
 loop.run_forever()
