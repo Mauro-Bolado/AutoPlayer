@@ -47,7 +47,7 @@ for client in clients_list:
 
 
 for client in clients_list:
-    client.add_event_handler(massive_spend_handler, events.NewMessage(chats='me', pattern=r'/spend (\d{1,2})'))
+    client.add_event_handler(massive_spend_handler, events.NewMessage(chats=-1001175888130, pattern=r'/spend (\d{1,2})'))
 
 
 ###########################################################################################

@@ -72,7 +72,7 @@ async def mobs_to_group_handler(event: Message):
     client = event.client  # type: CwClient
     if 'You met some hostile creatures' in event.raw_text:
         await asyncio.sleep(2)
-        await event.forward_to(-1001277066769)
+        await event.forward_to(-100486181604)
 
 async def arena_handler(event: Message):
     client = event.client  # type: CwClient
@@ -108,7 +108,7 @@ async def drugs(event: Message):
         await client.send_message('@chtwrsbot', '/use_p05')
         await asyncio.sleep(randint(2, 3))
         await client.send_message('@chtwrsbot', '/use_p06')
-    elif 'morph' in event.raw_text:
+    elif '/morph' in event.raw_text:
         await asyncio.sleep(randint(1,600))
         await client.send_message('@chtwrsbot', '/use_p19')
         await asyncio.sleep(randint(2, 3))
