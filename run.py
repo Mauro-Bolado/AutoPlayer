@@ -162,7 +162,6 @@ clients.artorias.add_event_handler(async_get_castle_order, events.NewMessage(cha
 text = "🏅Me"
 updated = False
 
-@clients.artorias.on(events.NewMessage(chats='chtwrsbot', incoming=True))
 async def up_to_date_info(message: Message):
     global updated
     if 'Castle' in message.raw_text:
@@ -172,8 +171,6 @@ async def up_to_date_info(message: Message):
         # print(client.castle)
         
         
-
-@clients.artorias.on(events.NewMessage(chats='chtwrsbot', incoming=False))
 async def send_me(message :Message):
     now = datetime.now(timezone.utc)
     cw_hour = (now.hour + 1) % 8
@@ -183,15 +180,16 @@ async def send_me(message :Message):
     if cw_hour == 7 and not updated:
         await asyncio.sleep(2)
         await client.send_message('chtwrsbot', text)
-
         
+
+for client in clients_list:
+    client.add_event_handler(send_me, events.NewMessage(chats='chtwrsbot'))
+    client.add_event_handler(up_to_date_info, events.NewMessage(chats='chtwrsbot'))
     
 ###########################################################################################
 #                                       Mobs                                              #
 ###########################################################################################
 
-
-@clients.artorias.on(events.NewMessage(chats=[486181604, 1140588463]))
 async def mobs_to_player(event:Message):
     if 'You met some hostile creatures' in event.raw_text and not "Forbidden Champion" in event.raw_text:
         pattern = r'lvl.\d{2}'
@@ -208,6 +206,9 @@ async def mobs_to_player(event:Message):
         if player_lvl <= (max(lvl) - 8) and player_lvl >= (max(lvl) - 10):
             await event.forward_to('chtwrsbot')
 
+for client in clients_list:
+    client.add_event_handler(mobs_to_player, events.NewMessage(chats=[scriptchats.kgm, scriptchats.moon_squad, scriptchats.mobs, scriptchats.mobs_kgm]))
+
 ###########################################################################################
 #                                       Run                                               #
 ###########################################################################################
@@ -217,7 +218,7 @@ for client in clients_list:
         client.start()
         print(f'{client.name} started')
     except:
-        print("Error")
+        print("Error in client start")
         pass
 
 loop.run_forever()
