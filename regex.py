@@ -32,50 +32,66 @@ class HeroInfo():
 test_text = """🌟Congratulations! New level!🌟
 Press /level_up
 
-Battle of the seven castles in 2h 28 minutes!
+Battle of the seven castles in 2h 1 minutes!
 
-🦅Minion GA Sentinel of Highnest Castle
-🏅Level: 61
-⚔️Atk: 299 🛡Def: 810
-🔥Exp: 2056654/2283221
-❤️Hp: 1375/1375
-🔋Stamina: 7/25 ⏰15min
-💧Mana: 610/610
-💰10805 👝1362 💎156
+🌑[KGM]Artorias Alchemist of Moonlight Castle
+🏅Level: 74 35.87%
+⚔️Atk: 802 🛡Def: 606
+🔥Exp: 12839752/13979158
+❤️Hp: 572/1449
+🔋Stamina: 24/27 ⏰59min
+💧Mana: 894/894
+💰98 👝1389 💎4
 
-🎽Equipment +111⚔️+252🛡
-🎒Bag: 6/15 /inv
+🎽Equipment +197⚔️+166🛡
+🎒Bag: 11/15 /inv
 
 
 Pet:
-🐷 guardian pig Coronel (27 lvl) 😁 /pet
+🐎 stud +4⚡️ Sif (14 lvl) 😁 /pet
 
 State:
-🛡Defending 🦅Highnest Castle
+🛌Rest /myshop_open
 
 More: /hero"""
 
+
 hero_pattern = compile(r'[\d\D]+!\n+'
                        r'(?P<castle_emoji>[\d\D])(?P<guild_emoji>[^\w]+)?'
-                       r'(\[(?P<guild_tag>\w{2,3})\])?(?P<name>[\w _]+) '
+                       r'(\[(?P<guild_tag>\w{2,3})\])?(?P<name>[\w _]{4,16}) '
                        r'(?P<primary_class>\w+)'
                        r' of (?P<castle>\w+) Castle\n+'
-                       r'.+Level: (?P<level>\d+)\n+'
-                       r'.+Atk: (?P<atk>\d+).+Def: (?P<def>\d+)\n+'
-                       r'.+Exp: (?P<exp>\d+)/\d+\n+'
+                       r'.+Level: (?P<level>\d+)[\D]+(?P<lvl_percent>[0-9]+.+[0-9]+).+\n+'
+                       r'.+Atk: (?P<atk>\d+)[\D]+Def: (?P<def>\d+)\n+'
+                       r'.+Exp: (?P<exp>\d+)[\D]\d+\n+'
                        r'.+Hp: (?P<hp>\d+)/\d+\n+'
                        r'.+Stamina: (?P<stamina>\d+)/(?P<max_stamina>\d+)(.+)?\n+'
                        r'(.+Mana: (?P<mana>\d+)/\d+\n+)?'
                        r'\D+(?P<gold>\d+)(\D+(?P<pogs>\d+)(\D+(?P<diamonds>\d+))?)?\n+'
                        r'\W+Equipment ((\+(?P<eq_atk>\d+)⚔)?(\D+(?P<eq_def>\d+))?)?.+\n+'
                        r'.+\n+'
-                       r'(Pet:\n(?P<pet_emoji>[^\w ]) \w+ (?P<pet>\w+) (?P<pet_name>[\w ]+) \((?P<pet_level>\d+)'
+                       r'(Pet:\n(?P<pet_emoji>[^\w ])[\w ]+?(?P<pet>\w+) (?P<pet_enchant>\+\d[^ ]+) (?P<pet_name>[\w ]+) \((?P<pet_level>\d+)'
                        r' lvl\) (?P<pet_status>[^ ]+) /pet\n+)?'
                        r'State:\n(?P<state>.+)\n+'
                        r'[\d\D]+')
+                       
+mobs = """You met some hostile creatures. Be careful:
+Forbidden Blacksmith lvl.70
+  ╰ golem minion, bow vulnerability
+Forbidden Blacksmith lvl.70
 
+/fight_5qwt8UFBvoDfzMrVFnZz"""
+ 
 if __name__ == '__main__':
     import re
-    match = re.match(hero_pattern, test_text)
-    print(test_text[match.start():match.end()] == test_text)
-    print(match.groupdict())
+
+    # match = re.match(hero_pattern, test_text)
+    # print(match)
+    # print(test_text[match.start():match.end()] == test_text)
+    # print(match.groupdict())
+    
+    pattern = r'lvl.\d{2}'
+    lvl_list = re.findall(pattern, mobs)
+    lvl = [int(x[4:]) for x in lvl_list]
+    print(lvl)
+    

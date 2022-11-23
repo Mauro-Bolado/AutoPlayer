@@ -40,8 +40,6 @@ async def autoquest_restored_handler(event: Message):
 async def auto_click_quest_r_handler (event: Message):
     client = event.client  # type: CwClient
     if 'Many things can happen in the forest.' in event.raw_text:
-        print('clicking')
-        print(event.raw_text)
         await asyncio.sleep(randint(4,5))
         await event.message.buttons[0][randint(0, len(event.buttons[0])-1)].click()
 
@@ -117,6 +115,21 @@ async def drugs(event: Message):
         await client.send_message('@chtwrsbot', '/use_p20')
         await asyncio.sleep(randint(2, 3))
         await client.send_message('@chtwrsbot', '/use_p21')
+        
+async def mobs_to_player(client:CwClient, event:Message):
+    print('here')
+    if 'You met some hostile creatures' in event.raw_text and not "Forbidden Champion" in event.raw_text:
+        pattern = compile(r'(lvl.)(?P<mob_lvl>[\d]{2})')
+        lvl_lits = re.match(pattern, event.raw_text)
+        player_lvl = client.level
+        if player_lvl >= max(lvl_lits) - 7 and player_lvl <= min(lvl_lits) + 10:
+            await event.forward_to('chtwrsbot')
+    elif "Forbidden Champion" in event.raw_text:
+        pattern = compile(r'(lvl.)(?P<mob_lvl>[\d]{2})')
+        lvl_lits = re.match(pattern, event.raw_text)
+        if player_lvl < (max(lvl_lits) - 8) and player_lvl > (max(lvl_lits) - 10):
+            await event.forward_to('chtwrsbot')
+        
 
 async def go_and_trader(resource: str, event: Message):
     client = event.client # type: CwClient

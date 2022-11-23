@@ -22,8 +22,8 @@ import types
 
 logging.basicConfig(format='[%(levelname) 5s/%(asctime)s]%(name)s:%(message)s', level=logging.WARNING)
 
-loop = asyncio.get_event_loop()
-
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 
 ###########################################################################################
 #                                  Events Asignation                                      #
@@ -48,6 +48,11 @@ for client in clients_list:
 
 for client in clients_list:
     client.add_event_handler(massive_spend_handler, events.NewMessage(chats=-1001175888130, pattern=r'/spend (\d{1,2})'))
+    
+
+    
+for clien in [clients.artorias]:
+    client.add_event_handler(mobs_to_player(client, events.NewMessage(chats=[-100486181604, -1001175888130, -1001140588463, -1001485772986])), events.NewMessage(chats=[-100486181604, -1001175888130, -1001140588463, -1001485772986]))
 
 
 ###########################################################################################
@@ -125,53 +130,94 @@ Tactics: /tactics_sharkteeth (https://t.me/share/url?url=/tactics_sharkteeth)"""
 current_order = Order()
 default_order = "🛡Defend"
 
-order_pattern = re.compile(r'\W{0,2}'
+order_bot_pattern = re.compile(r'\W{0,2}'
                            r'(?P<attack>[\S]){0,1}'
                            r'\W+ to DEF!'
                            r'\W+Tactics: \W(?P<tactics>\w+)') 
+                           
+order_raw_pattern = re.compile(r'[\w \n]*(?P<attack>[\S\W]){0,1}[\w \n]*')
+
 def castle_order(order: str):
     global current_order
-    order_match = re.match(order_pattern, order)
-    current_order = Order(order_match.group('attack'), "", order_match.group('tactics'), "") 
+    order_match = re.match(order_bot_pattern, order)
+    if not order_match:
+        order_match = re.match(order_raw_pattern, order)
+        current_order = Order(order_match.group('attack'), "", "", "") 
+    else:
+        current_order = Order(order_match.group('attack'), "", order_match.group('tactics'), "")
 
 async def async_get_castle_order(client: CwClient, sender, event: Message):
     if event.client == client:
         if event.sender is sender:
             castle_order(event.text)
             await set_orders(client, str(current_order), pinned=False, minutes=2)
+        
+clients.artorias.add_event_handler(async_get_castle_order, events.NewMessage(chats=scriptchats.moon_squad))
 
-async def handle():
-    for client in clients_list:
-        order = await client.get_messages(scriptchats.moon_squad, 1)
-        client_event = await async_get_castle_order(client, sender = scriptchats.moon_squad, event = order)
-        client.add_event_handler(client_event)
 
 ###########################################################################################
 #                                        Update Info                                      #
 ###########################################################################################
 
 text = "🏅Me"
+updated = False
 
-async def up_to_date_info(client: CwClient, message: Message):
+@clients.artorias.on(events.NewMessage(chats='chtwrsbot', incoming=True))
+async def up_to_date_info(message: Message):
+    global updated
+    if 'Castle' in message.raw_text:
+        updated = True
+        # print(message.raw_text)
+        client.update(message.raw_text)
+        # print(client.castle)
+        
+        
+
+@clients.artorias.on(events.NewMessage(chats='chtwrsbot', incoming=False))
+async def send_me(message :Message):
     now = datetime.now(timezone.utc)
     cw_hour = (now.hour + 1) % 8
-    count = 1
+    global updated
     if cw_hour == 0:
-        count = 0
-        client.send_message('chtwrsbot', text)
-    if cw_hour == 7:
-        count = 1
-    if message.sender == 'chtwrsbot':
-        client.update(message.text)
-        file = open('me.txt', 'w')
-        file.write(message.text)
-        file.close()
-        
-for client in clients_list:
-    client.add_event_handler(up_to_date_info, events.NewMessage(chats='chtwrsbot'))
-    
-for client in clients_list:
-    client.start()
+        updated = False
+    if cw_hour == 7 and not updated:
+        await asyncio.sleep(2)
+        await client.send_message('chtwrsbot', text)
 
-print("Done")
+        
+    
+###########################################################################################
+#                                       Mobs                                              #
+###########################################################################################
+
+
+@clients.artorias.on(events.NewMessage(chats=[486181604, 1140588463]))
+async def mobs_to_player(event:Message):
+    if 'You met some hostile creatures' in event.raw_text and not "Forbidden Champion" in event.raw_text:
+        pattern = r'lvl.\d{2}'
+        lvl_list = re.findall(pattern, event.raw_text)
+        lvl = [int(x[4:]) for x in lvl_list]
+        player_lvl = int(client.level)
+        if player_lvl >= max(lvl) - 7 and player_lvl <= min(lvl) + 10:
+            await event.forward_to('chtwrsbot')
+    elif "Forbidden Champion" in event.raw_text:
+        pattern = r'lvl.\d{2}'
+        lvl_list = re.findall(pattern, event.raw_text)
+        lvl = [int(x[4:]) for x in lvl_list]
+        player_lvl = int(client.level)
+        if player_lvl <= (max(lvl) - 8) and player_lvl >= (max(lvl) - 10):
+            await event.forward_to('chtwrsbot')
+
+###########################################################################################
+#                                       Run                                               #
+###########################################################################################
+
+for client in clients_list:
+    try:
+        client.start()
+        print(f'{client.name} started')
+    except:
+        print("Error")
+        pass
+
 loop.run_forever()
