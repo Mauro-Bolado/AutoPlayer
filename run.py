@@ -207,7 +207,7 @@ async def mobs_to_player(event:Message):
             await event.forward_to('chtwrsbot')
 
 for client in clients_list:
-    client.add_event_handler(mobs_to_player, events.NewMessage(chats=[scriptchats.kgm, scriptchats.moon_squad, scriptchats.mobs, scriptchats.mobs_kgm]))
+    client.add_event_handler(mobs_to_player, events.NewMessage(chats=[scriptchats.kgm, scriptchats.moon_squad, scriptchats.mobs, scriptchats.mobs_kgm], incoming=True))
 
 ###########################################################################################
 #                                       Run                                               #

@@ -1,4 +1,3 @@
-from http import client
 from telethon import TelegramClient
 from telethon.sessions import StringSession
 
@@ -16,7 +15,8 @@ def save_session(client, str_session):
    file.write('\n' + str)
    file.close()
 
-with TelegramClient(StringSession(), api_id, api_hash) as session:
-   client = input("Enter your client: ")
-   str = session.session.save()
-   save_session(client, str)
+if __name__ == '__main__':
+   with TelegramClient(StringSession(), api_id, api_hash) as session:
+      client = input("Enter your client: ")
+      str = session.session.save()
+      save_session(client, str)
